@@ -1,0 +1,9 @@
+pandas
+pyarrow
+numpy
+scikit-learn
+rank_bm25
+tqdm
+openai
+sentence-transformers
+scipy
