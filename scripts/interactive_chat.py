@@ -6,11 +6,11 @@ Standalone terminal companion to CommerceAgent.ipynb: same RAG chatbot
 same SBERT + LLM-judge evaluation, but driven by live input() at the
 terminal instead of a fixed batch of queries in a notebook cell.
 
-Usage:
-    python interactive_chat.py
+Usage (from the repo root):
+    python scripts/interactive_chat.py
 
-Requires: pandas, pyarrow, rank_bm25, openai, sentence-transformers, scipy
-    pip install pandas pyarrow rank_bm25 openai sentence-transformers scipy
+Requires: see requirements.txt
+    pip install -r requirements.txt
 
 Needs `git` and `git-lfs` on PATH to fetch the ESCI dataset the first time,
 and an OPENAI_API_KEY (env var, or you'll be prompted for it).
@@ -21,13 +21,15 @@ import json
 import os
 import subprocess
 from getpass import getpass
+from pathlib import Path
 
 import pandas as pd
 from rank_bm25 import BM25Okapi
 
-ESCI_DIR = "esci-data"
-DATA_BASE = os.path.join(ESCI_DIR, "shopping_queries_dataset")
-LIVE_RESULTS_PATH = "live_eval_results.csv"
+REPO_ROOT = Path(__file__).resolve().parent.parent
+ESCI_DIR = REPO_ROOT / "esci-data"
+DATA_BASE = ESCI_DIR / "shopping_queries_dataset"
+LIVE_RESULTS_PATH = REPO_ROOT / "results" / "live_eval_results.csv"
 FIELDNAMES = ["query", "chatbot_answer", "reference_answer", "sbert_similarity",
               "correctness", "groundedness", "helpfulness", "llm_judge_overall", "rationale"]
 
@@ -152,6 +154,7 @@ def score_turn(client, sbert_model, util, query, answer, reference):
 
 
 def main():
+    LIVE_RESULTS_PATH.parent.mkdir(parents=True, exist_ok=True)
     ensure_esci_data()
     print("Loading ESCI dataset...")
     df = load_data()
